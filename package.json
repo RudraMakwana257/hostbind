@@ -1,0 +1,20 @@
+{
+  "name": "hostbind",
+  "version": "0.0.1",
+  "description": "HostBind local-first project context CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RudraMakwana257/hostbind.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RudraMakwana257/hostbind/issues"
+  },
+  "homepage": "https://github.com/RudraMakwana257/hostbind#readme"
+}
