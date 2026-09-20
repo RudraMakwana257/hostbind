@@ -38,6 +38,7 @@ var runCmd = &cobra.Command{
 		availableAdapters := []adapters.Adapter{
 			&adapters.ViteAdapter{},
 			&adapters.NextAdapter{},
+			&adapters.PythonAdapter{},
 		}
 		
 		highestScore := 0
