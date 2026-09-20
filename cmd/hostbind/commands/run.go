@@ -8,6 +8,7 @@ import (
 
 	"github.com/RudraMakwana257/hostbind/internal/adapters"
 	"github.com/RudraMakwana257/hostbind/internal/allocator"
+	"github.com/RudraMakwana257/hostbind/internal/envgen"
 	"github.com/RudraMakwana257/hostbind/internal/registry"
 	"github.com/RudraMakwana257/hostbind/internal/runner"
 	"github.com/spf13/cobra"
@@ -76,6 +77,28 @@ var runCmd = &cobra.Command{
 		if err != nil {
 			fmt.Printf("Error starting process: %v\n", err)
 			os.Exit(1)
+		}
+
+		if err := reg.UpdatePID(port, pid); err != nil {
+			fmt.Printf("Warning: failed to update PID in registry: %v\n", err)
+		}
+
+		// 6. Generate Env
+		envVars := map[string]string{
+			"HOSTBIND_PROJECT":  project,
+			"HOSTBIND_INSTANCE": instance,
+			"HOSTBIND_SERVICE":  name,
+			"HOSTBIND_PORT":     fmt.Sprintf("%d", port),
+			"HOSTBIND_URL":      fmt.Sprintf("http://localhost:%d", port),
+		}
+		
+		// Optional: add adapter specific envs
+		for k, v := range portConfig.Env {
+			envVars[k] = v
+		}
+
+		if err := envgen.GenerateSync(dir, envVars); err != nil {
+			fmt.Printf("Warning: failed to sync .env.hostbind: %v\n", err)
 		}
 
 		fmt.Printf("✅ Running with PID %d\n", pid)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/RudraMakwana257/hostbind/internal/registry"
 	"github.com/spf13/cobra"
@@ -28,13 +29,25 @@ var contextCmd = &cobra.Command{
 		}
 		defer reg.Close()
 
-		// TODO: Query the current directory's project/instance from DB.
+		dir, _ := os.Getwd()
+		project := filepath.Base(dir)
+		instance := "main"
+
+		allocs, err := reg.GetProjectAllocations(project, instance)
+		if err != nil {
+			fmt.Printf("Failed to get project allocations: %v\n", err)
+			os.Exit(1)
+		}
+
+		services := make(map[string]string)
+		for _, a := range allocs {
+			services[a.ServiceName] = fmt.Sprintf("http://localhost:%d", a.Port)
+		}
+
 		out := ContextOutput{
-			Project:  "hostbind",
-			Instance: "main",
-			Services: map[string]string{
-				"web": "http://localhost:4300",
-			},
+			Project:  project,
+			Instance: instance,
+			Services: services,
 		}
 
 		if jsonFlag {
