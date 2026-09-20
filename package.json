@@ -1,10 +1,12 @@
 {
   "name": "hostbind",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "HostBind local-first project context CLI",
-  "main": "index.js",
+  "bin": {
+    "hostbind": "bin/wrapper.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "node scripts/install.js"
   },
   "keywords": [],
   "author": "",
