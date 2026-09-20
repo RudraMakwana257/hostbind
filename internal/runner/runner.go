@@ -30,9 +30,17 @@ func (r *Runner) Start(cmdArgs []string, project, instance, service string) (int
 
 	// Append adapter-specific arguments (e.g. --port 4300)
 	finalArgs := append(cmdArgs[1:], r.config.Args...)
-	
+
 	cmd := exec.Command(cmdArgs[0], finalArgs...)
-	logDir := filepath.Join(os.Getenv("HOME"), ".hostbind", "logs")
+
+	// Fix #4: Use os.UserHomeDir() instead of os.Getenv("HOME")
+	// os.Getenv("HOME") is empty on Windows; UserHomeDir() is cross-platform.
+	home, err := os.UserHomeDir()
+	if err != nil {
+		home = os.TempDir() // Fallback to temp dir if home unavailable
+	}
+
+	logDir := filepath.Join(home, ".hostbind", "logs")
 	os.MkdirAll(logDir, 0755)
 	logPath := filepath.Join(logDir, fmt.Sprintf("%s-%s-%s.log", project, instance, service))
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
