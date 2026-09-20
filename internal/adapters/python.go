@@ -24,20 +24,42 @@ func (a *PythonAdapter) Detect(dir string) (bool, int) {
 }
 
 func (a *PythonAdapter) DefaultCommand() []string {
-	// Simple fallback, we assume FastAPI or uvicorn
+	// Prefer uvicorn if main.py exists (FastAPI pattern)
 	if _, err := os.Stat("main.py"); err == nil {
 		return []string{"python", "-m", "uvicorn", "main:app"}
 	}
+	// Fall back to plain python app.py (Flask pattern)
 	return []string{"python", "app.py"}
 }
 
+// PortArgs returns the port configuration for the detected Python framework.
+//
+// Fix #8: Previously this always appended --port even for Flask apps
+// (plain `python app.py`), which don't accept that CLI flag and would crash.
+//
+// Now we distinguish between uvicorn (accepts --port) and plain Python
+// (uses PORT env var only). If a custom command is passed, the user is
+// responsible for port injection.
 func (a *PythonAdapter) PortArgs(port int) PortConfig {
+	portStr := fmt.Sprintf("%d", port)
+
+	// Check if the default command is uvicorn-based (main.py exists)
+	_, mainExists := os.Stat("main.py")
+	isUvicorn := mainExists == nil // main.py present → we use uvicorn
+
+	if isUvicorn {
+		// uvicorn accepts --port <port> as a CLI argument
+		return PortConfig{
+			Env:  map[string]string{"PORT": portStr},
+			Args: []string{"--port", portStr},
+		}
+	}
+
+	// Flask / plain python: inject via PORT env var only.
+	// Adding --port here would break: `python app.py --port 4300` is invalid.
 	return PortConfig{
-		Env: map[string]string{
-			"PORT": fmt.Sprintf("%d", port),
-		},
-		// Append --port if it's uvicorn
-		Args: []string{"--port", fmt.Sprintf("%d", port)},
+		Env:  map[string]string{"PORT": portStr},
+		Args: nil,
 	}
 }
 
