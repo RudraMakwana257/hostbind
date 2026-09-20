@@ -1,6 +1,6 @@
 module github.com/RudraMakwana257/hostbind
 
-go 1.25.0
+go 1.23.0
 
 require (
 	github.com/metoro-io/mcp-golang v0.16.1

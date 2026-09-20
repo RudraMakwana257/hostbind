@@ -1,2 +1,21 @@
+# Exclude pre-built binaries (users download at install time)
 bin/hostbind
 bin/hostbind.exe
+
+# Exclude Go source code — not needed in npm package
+cmd/
+internal/
+go.mod
+go.sum
+test_mcp.go
+
+# Exclude CI/CD and development files
+.github/
+docs/
+skills/
+*.md
+!README.md
+
+# Exclude generated/runtime files
+AGENTS.md
+.env.hostbind
