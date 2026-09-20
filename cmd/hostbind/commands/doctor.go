@@ -29,22 +29,13 @@ var doctorCmd = &cobra.Command{
 
 		fmt.Println("🩺 HostBind Doctor - Diagnostic Report")
 		fmt.Println("--------------------------------------")
-		
+
 		issuesFound := 0
 		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-		
+
 		for _, a := range allocs {
-			// 1. Check if PID is alive
-			pidAlive := false
-			if a.GetPID() > 0 {
-				process, err := os.FindProcess(a.GetPID())
-				if err == nil {
-					// In Unix, finding a process always succeeds, but sending signal 0 checks if it's actually alive
-					// We'll assume if it's in DB, we check port instead for cross-platform reliability.
-					_ = process
-					pidAlive = true
-				}
-			}
+			// 1. Check if PID is alive (cross-platform, using process.go helper)
+			pidAlive := isPIDAlive(a.GetPID())
 
 			// 2. Check if port is bound
 			portBound := false
@@ -71,7 +62,7 @@ var doctorCmd = &cobra.Command{
 				fmt.Fprintf(w, "✅\t%s\t(Port %d)\tHealthy\n", a.ServiceName, a.Port)
 			}
 		}
-		
+
 		w.Flush()
 
 		if issuesFound == 0 {

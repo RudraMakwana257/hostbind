@@ -48,12 +48,11 @@ var stopCmd = &cobra.Command{
 		if target.GetPID() > 0 {
 			process, err := os.FindProcess(target.GetPID())
 			if err == nil {
-				// Kill the process
-				if err := process.Kill(); err != nil {
-					fmt.Printf("Warning: failed to kill process %d: %v\n", target.GetPID(), err)
-				} else {
-					fmt.Printf("🛑 Stopped service '%s' (PID: %d)\n", serviceName, target.GetPID())
-				}
+				// Fix #7: Use graceful shutdown (SIGTERM → wait → SIGKILL) instead
+				// of immediately sending SIGKILL, giving dev servers a chance to
+				// clean up temp files and connections.
+				gracefulStop(process)
+				fmt.Printf("🛑 Stopped service '%s' (PID: %d)\n", serviceName, target.GetPID())
 			}
 		}
 
