@@ -45,14 +45,14 @@ var stopCmd = &cobra.Command{
 			return
 		}
 
-		if target.PID > 0 {
-			process, err := os.FindProcess(target.PID)
+		if target.GetPID() > 0 {
+			process, err := os.FindProcess(target.GetPID())
 			if err == nil {
 				// Kill the process
 				if err := process.Kill(); err != nil {
-					fmt.Printf("Warning: failed to kill process %d: %v\n", target.PID, err)
+					fmt.Printf("Warning: failed to kill process %d: %v\n", target.GetPID(), err)
 				} else {
-					fmt.Printf("🛑 Stopped service '%s' (PID: %d)\n", serviceName, target.PID)
+					fmt.Printf("🛑 Stopped service '%s' (PID: %d)\n", serviceName, target.GetPID())
 				}
 			}
 		}

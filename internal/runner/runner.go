@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/RudraMakwana257/hostbind/internal/adapters"
 )
@@ -31,8 +32,17 @@ func (r *Runner) Start(cmdArgs []string, project, instance, service string) (int
 	finalArgs := append(cmdArgs[1:], r.config.Args...)
 	
 	cmd := exec.Command(cmdArgs[0], finalArgs...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	logDir := filepath.Join(os.Getenv("HOME"), ".hostbind", "logs")
+	os.MkdirAll(logDir, 0755)
+	logPath := filepath.Join(logDir, fmt.Sprintf("%s-%s-%s.log", project, instance, service))
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err == nil {
+		cmd.Stdout = logFile
+		cmd.Stderr = logFile
+	} else {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
 
 	// Inherit current environment and inject HostBind vars
 	env := os.Environ()

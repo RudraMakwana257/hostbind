@@ -30,7 +30,7 @@ var lsCmd = &cobra.Command{
 		fmt.Fprintln(w, "PROJECT\tINSTANCE\tSERVICE\tPORT\tSTATUS\tPID")
 		
 		for _, a := range allocs {
-			fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%d\n", a.ProjectName, a.Instance, a.ServiceName, a.Port, a.Status, a.PID)
+			fmt.Fprintf(w, "%s\t%s\t%s\t%d\t%s\t%d\n", a.ProjectName, a.Instance, a.ServiceName, a.Port, a.Status, a.GetPID())
 		}
 		
 		w.Flush()

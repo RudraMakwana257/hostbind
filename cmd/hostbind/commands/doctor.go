@@ -36,8 +36,8 @@ var doctorCmd = &cobra.Command{
 		for _, a := range allocs {
 			// 1. Check if PID is alive
 			pidAlive := false
-			if a.PID > 0 {
-				process, err := os.FindProcess(a.PID)
+			if a.GetPID() > 0 {
+				process, err := os.FindProcess(a.GetPID())
 				if err == nil {
 					// In Unix, finding a process always succeeds, but sending signal 0 checks if it's actually alive
 					// We'll assume if it's in DB, we check port instead for cross-platform reliability.

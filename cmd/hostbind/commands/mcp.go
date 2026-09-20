@@ -85,10 +85,10 @@ var mcpServerCmd = &cobra.Command{
 			}
 
 			msg := ""
-			if target.PID > 0 {
-				if process, err := os.FindProcess(target.PID); err == nil {
+			if target.GetPID() > 0 {
+				if process, err := os.FindProcess(target.GetPID()); err == nil {
 					_ = process.Kill()
-					msg += fmt.Sprintf("Stopped process PID %d. ", target.PID)
+					msg += fmt.Sprintf("Stopped process PID %d. ", target.GetPID())
 				}
 			}
 

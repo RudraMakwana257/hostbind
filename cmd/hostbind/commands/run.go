@@ -94,6 +94,7 @@ var runCmd = &cobra.Command{
 		pid, err := r.Start(runArgs, project, instance, name)
 		if err != nil {
 			fmt.Printf("Error starting process: %v\n", err)
+			reg.ReleasePort(port)
 			os.Exit(1)
 		}
 
@@ -120,6 +121,7 @@ var runCmd = &cobra.Command{
 		}
 
 		fmt.Printf("✅ Running with PID %d\n", pid)
+		fmt.Printf("📄 Logs: ~/.hostbind/logs/%s-%s-%s.log\n", project, instance, name)
 		// TODO: Wait for process to exit and handle graceful shutdown
 	},
 }

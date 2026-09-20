@@ -11,9 +11,17 @@ type Allocation struct {
 	Instance    string
 	ServiceName string
 	Port        int
-	PID         int
+	PID         sql.NullInt64
 	Status      string
 }
+
+func (a *Allocation) GetPID() int {
+	if a.PID.Valid {
+		return int(a.PID.Int64)
+	}
+	return 0
+}
+
 
 // EnsureProject returns the ID of a project, creating it if it doesn't exist.
 func (r *Registry) EnsureProject(projectName, instanceName, path string) (int, error) {
