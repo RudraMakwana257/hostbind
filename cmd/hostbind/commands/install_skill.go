@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -15,7 +16,7 @@ var installSkillCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		const skillContent = `
 # HostBind Agent Skill
-Always use 'hostbind run --name <service>' to start servers. 
+Always use 'hostbind run --name <service>' to start servers.
 Never hardcode or guess ports. Run 'hostbind context --json' to discover active ports.
 Do not modify vite.config.ts or next.config.js to hardcode ports.
 `
@@ -34,22 +35,57 @@ Do not modify vite.config.ts or next.config.js to hardcode ports.
 			}
 		}
 
-		// 2. Install globally for Antigravity/Cursor/Agents
+		// 2. Install globally for all known AI agent frameworks
+		// Fix #10: Previously hardcoded to Antigravity path only.
+		// Now installs to multiple agent skill directories for broad compatibility.
 		home, err := os.UserHomeDir()
-		if err == nil {
-			skillDir := filepath.Join(home, ".gemini", "antigravity-cli", "skills", "hostbind-local-development")
-			if err := os.MkdirAll(skillDir, 0755); err == nil {
-				skillPath := filepath.Join(skillDir, "SKILL.md")
-				
-				// Full skill content
-				fullSkill := `---
+		if err != nil {
+			fmt.Printf("Warning: could not find home directory: %v\n", err)
+			return
+		}
+
+		fullSkillContent := `---
 name: hostbind-local-development
 description: Use HostBind for local port management and zero-conflict multi-project setups.
 ---
 ` + skillContent
 
-				os.WriteFile(skillPath, []byte(fullSkill), 0644)
-				fmt.Println("✅ Successfully installed global HostBind skill for AI agents")
+		// Agent skill directories to install into
+		agentDirs := []struct {
+			name string
+			path string
+		}{
+			{
+				name: "Antigravity CLI",
+				path: filepath.Join(home, ".gemini", "antigravity", "skills", "hostbind"),
+			},
+			{
+				name: "Gemini CLI (legacy)",
+				path: filepath.Join(home, ".gemini", "skills", "hostbind"),
+			},
+		}
+
+		// On Windows/Mac: also try Cursor rules directory
+		if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+			agentDirs = append(agentDirs, struct {
+				name string
+				path string
+			}{
+				name: "Cursor (.cursor/rules)",
+				path: filepath.Join(home, ".cursor", "rules"),
+			})
+		}
+
+		for _, agentDir := range agentDirs {
+			if err := os.MkdirAll(agentDir.path, 0755); err != nil {
+				fmt.Printf("⚠️  Could not create dir for %s: %v\n", agentDir.name, err)
+				continue
+			}
+			skillPath := filepath.Join(agentDir.path, "SKILL.md")
+			if err := os.WriteFile(skillPath, []byte(fullSkillContent), 0644); err != nil {
+				fmt.Printf("⚠️  Could not write skill for %s: %v\n", agentDir.name, err)
+			} else {
+				fmt.Printf("✅ Installed HostBind skill for %s\n", agentDir.name)
 			}
 		}
 	},
