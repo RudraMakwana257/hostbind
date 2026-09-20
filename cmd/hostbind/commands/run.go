@@ -63,10 +63,27 @@ var runCmd = &cobra.Command{
 		portConfig := activeAdapter.PortArgs(port)
 		r := runner.New(port, portConfig)
 
-		// Command arguments
+		// Command arguments & Security Check
 		runArgs := args
+		isCustomCommand := false
 		if len(runArgs) == 0 {
 			runArgs = activeAdapter.DefaultCommand()
+		} else {
+			isCustomCommand = true
+		}
+
+		if isCustomCommand {
+			// Security: Do not allow AI agents to run arbitrary dangerous commands
+			fmt.Printf("⚠️  Security Alert: An attempt is being made to run a custom command:\n")
+			fmt.Printf("   > %v\n", runArgs)
+			fmt.Printf("Allow this execution? [y/N]: ")
+			
+			var response string
+			fmt.Scanln(&response)
+			if response != "y" && response != "Y" && response != "yes" {
+				fmt.Println("❌ Execution cancelled by user.")
+				os.Exit(1)
+			}
 		}
 
 		fmt.Printf("🚀 HostBind: Starting '%s' on port %d using %s adapter\n", name, port, activeAdapter.Name())
