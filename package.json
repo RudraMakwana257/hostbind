@@ -1,6 +1,6 @@
 {
   "name": "hostbind",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "HostBind local-first project context CLI",
   "bin": {
     "hostbind": "bin/wrapper.js"
