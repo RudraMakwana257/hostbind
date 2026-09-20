@@ -1,16 +1,37 @@
 {
   "name": "hostbind",
   "version": "1.0.2",
-  "description": "HostBind local-first project context CLI",
+  "description": "HostBind — local-first port registry and service allocator for AI agents and developers",
   "bin": {
     "hostbind": "bin/wrapper.js"
   },
   "scripts": {
     "postinstall": "node scripts/install.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "port",
+    "localhost",
+    "dev",
+    "ai",
+    "agent",
+    "mcp",
+    "proxy",
+    "registry",
+    "vite",
+    "nextjs"
+  ],
+  "author": "RudraMakwana257",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/RudraMakwana257/hostbind.git"
